@@ -17,7 +17,7 @@ The pipeline ingests YouTube metadata, stores raw data in S3, processes & optimi
 
 ## 🚀 Architecture Diagram
 
-![Architecture](./docs/architecture.png)
+![Architecture](https://chatgpt.com/c/68c91b7e-57e0-8327-9b2b-5977bbb54a7f)
 
 **Workflow:**
 1. **Ingestion** → AWS Lambda fetches YouTube API data, streams via Kinesis, stores raw JSON in S3.  
@@ -59,9 +59,6 @@ youtube-databricks-pipeline/
 └── docs/
 └── architecture.png
 
-yaml
-Copy code
-
 ---
 
 ## ⚙️ Technologies Used
@@ -93,20 +90,16 @@ Copy code
 git clone https://github.com/<your-username>/youtube-databricks-pipeline.git
 cd youtube-databricks-pipeline
 2. Deploy Infrastructure
-bash
-Copy code
 cd infra
 terraform init
 terraform apply
 3. Deploy Lambda Functions
 Each Lambda folder (lambda/ingest_preprocess, lambda/kinesis_consumer, etc.) has its own requirements.txt. Package and deploy:
-
-bash
-Copy code
 cd lambda/ingest_preprocess
 pip install -r requirements.txt -t .
 zip -r function.zip .
 aws lambda update-function-code --function-name ingest_preprocess --zip-file fileb://function.zip
+
 4. Import Databricks Notebooks
 Go to Databricks Workspace → Repos → Import each notebook from databricks/notebooks/.
 
@@ -119,8 +112,7 @@ Upload stepfunctions/state_machine.asl.json into AWS Step Functions.
 Link with Lambda for Databricks job trigger.
 
 📊 Example Queries (Databricks SQL)
-sql
-Copy code
+
 -- Top 10 Channels by Video Count
 SELECT channel, COUNT(*) AS video_count
 FROM youtube_silver
@@ -158,3 +150,4 @@ Integrate dbt for transformation lineage.
 🧑‍💻 Author
 Pratik Pattanaik
 Cloud & Data Engineer | AWS | Databricks | PySpark | SQL
+
