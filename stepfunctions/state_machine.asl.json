@@ -1,0 +1,34 @@
+{
+  "Comment": "YouTube batch orchestration -> trigger Databricks job",
+  "StartAt": "FetchYouTubeBatch",
+  "States": {
+    "FetchYouTubeBatch": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:fetch_youtube_batch",
+        "Payload": {"channel_id.$": "$.channel_id"}
+      },
+      "Next": "TriggerDatabricksJob"
+    },
+    "TriggerDatabricksJob": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "arn:aws:lambda:REGION:ACCOUNT_ID:function:trigger_databricks_job",
+        "Payload": {"job_params.$": "$.job_params"}
+      },
+      "Next": "NotifySuccess"
+    },
+    "NotifySuccess": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Parameters": {
+        "TopicArn": "arn:aws:sns:REGION:ACCOUNT_ID:youtube-notifications",
+        "Message": "Databricks job triggered by Step Functions",
+        "Subject": "YouTube ETL Triggered"
+      },
+      "End": true
+    }
+  }
+}

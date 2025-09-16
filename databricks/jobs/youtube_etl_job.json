@@ -1,0 +1,52 @@
+{
+  "name": "YouTube Data Pipeline",
+  "email_notifications": {
+    "on_start": [],
+    "on_success": ["your_email@example.com"],
+    "on_failure": ["your_email@example.com"]
+  },
+  "timeout_seconds": 3600,
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "ingest_raw",
+      "description": "Ingest raw YouTube JSON data from S3 to Bronze Delta",
+      "notebook_task": {
+        "notebook_path": "/Repos/your-user/youtube-databricks-pipeline/01_ingest_raw"
+      },
+      "new_cluster": {
+        "spark_version": "13.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 2
+      }
+    },
+    {
+      "task_key": "transform_delta",
+      "depends_on": [{"task_key": "ingest_raw"}],
+      "description": "Clean & transform data to Silver layer",
+      "notebook_task": {
+        "notebook_path": "/Repos/your-user/youtube-databricks-pipeline/02_transform_delta"
+      },
+      "existing_cluster_id": "my-cluster-id"
+    },
+    {
+      "task_key": "optimizations",
+      "depends_on": [{"task_key": "transform_delta"}],
+      "description": "Delta Lake optimizations (Z-Order, Vacuum, Schema Evolution)",
+      "notebook_task": {
+        "notebook_path": "/Repos/your-user/youtube-databricks-pipeline/03_optimizations"
+      },
+      "existing_cluster_id": "my-cluster-id"
+    },
+    {
+      "task_key": "reporting_queries",
+      "depends_on": [{"task_key": "optimizations"}],
+      "description": "Generate Gold layer reporting tables",
+      "notebook_task": {
+        "notebook_path": "/Repos/your-user/youtube-databricks-pipeline/04_reporting_queries"
+      },
+      "existing_cluster_id": "my-cluster-id"
+    }
+  ],
+  "format": "MULTI_TASK"
+}
